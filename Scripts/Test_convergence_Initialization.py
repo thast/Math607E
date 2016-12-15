@@ -8,19 +8,25 @@ in comparison to the analytic solution for B for a central receiver Bz
 
 PlotIt = True
 
+# Loop and receiver
 radius = 10.
 loc = np.r_[[[0.,0.,0.]]]
 obsloc = np.r_[[[0.,0.,0.]]]
 Bbslist = []
 
+#Initialize list
 errorlist=[]
 plist = []
 hlist = []
 
+#Analytic solution
 Bdip = circularloop(radius,obsloc,I=1.)
 Bdip = Bdip[0,2]
 meshsize = np.linspace(3,6,4)
+
+#Iterate over an increasing number of mesh cells
 for i in meshsize:
+	#Mesh
     csx, csy, csz = 101./(2.**i+1.),101./(2.**i+1.),101./(2.**i)
     hlist.append(csx)
     ncx, ncy, ncz = 2**i+1,2**i+1,2**i
@@ -29,9 +35,11 @@ for i in meshsize:
     hz= [(csz,ncz)]
     mesh = Mesh.TensorMesh([hx, hy, hz],x0="CCC")
     #mesh.x0[2] = mesh.x0[2]- csz/2.
+
+   	#Compute vector potential A and magnetic flux B
     CURL = mesh.edgeCurl
     listF = np.vstack([mesh.gridFx,mesh.gridFy,mesh.gridFz])
-    obsindex =np.argmin(np.linalg.norm(listF,axis=1))
+    obsindex =np.argmin(np.linalg.norm(listF-obsloc,axis=1))
     Aloopx = vectorPotential_circularloop(radius,mesh.gridEx)
     Aloopy = vectorPotential_circularloop(radius,mesh.gridEy)
     Aloopz = vectorPotential_circularloop(radius,mesh.gridEz)
@@ -39,8 +47,10 @@ for i in meshsize:
     BloopE = CURL * AloopE
     Bbslist.append(BloopE[obsindex])
 
+#Compute the relative error to analytic
 errorlist = [np.linalg.norm(Bbslist[i]-Bdip)/np.linalg.norm(Bdip) for i in range(0,len(Bbslist))]
 
+#Estimate the rate of convergence p
 plist = [np.log(errorlist[i+1]/errorlist[i])/np.log(hlist[i+1]/hlist[i])
         for i in range(0,len(errorlist)-1)]
 

@@ -7,6 +7,8 @@ in comparison to the analytic solution for B
 for a cicular loop
 """
 
+PlotIt = True
+
 #Cell size
 csx, csy, csz = 10.,10.,10.
 # Number of core cells in each directiPon s
@@ -30,11 +32,17 @@ m = sighalf*np.ones(mesh.nC)
 air = mesh.gridCC[:,2]>0.
 m[air] = 1e-8
 
+#Source Loop
 radius = 50.
 
-CURL = mesh.edgeCurl
+#Receiver
+loc = np.r_[[[0.,0.,0.]]]
+obsloc = np.r_[[[0.,0.,0.]]]
 listF = np.vstack([mesh.gridFx,mesh.gridFy,mesh.gridFz])
-obsindex =np.argmin(np.linalg.norm(listF,axis=1))
+obsindex =np.argmin(np.linalg.norm(listF-obsloc,axis=1))
+
+#Initialize B
+CURL = mesh.edgeCurl
 Aloopx = vectorPotential_circularloop(radius,mesh.gridEx)
 Aloopy = vectorPotential_circularloop(radius,mesh.gridEy)
 Aloopz = vectorPotential_circularloop(radius,mesh.gridEz)
@@ -43,21 +51,22 @@ BloopF_t0 = CURL * AloopE
 Bt0_analytic = mu_0/(2*radius)
 print 'relative error at initialization: ',np.abs(BloopF_t0[obsindex]-Bt0_analytic)/np.abs(Bt0_analytic)
 
-PlotIt = True
 
-loc = np.r_[[[0.,0.,0.]]]
-obsloc = np.r_[[[0.,0.,0.]]]
+#Initialize list
 Bbslist = []
 errorlist=[]
 plist = []
 klist = []
-timetarget = 1e-4
-timesteps = range(10,51,5)
 
+#Final Time and number of time steps to reach it
+timetarget = 1e-4
+timesteps = range(10,51,10)
+
+#Analytic
 Bz =mu_0*hzAnalyticCentLoopT(radius,timetarget,sighalf)
 print 'Analytic solution Bz for time %f s: '%(timetarget),Bz
 
-CURL = mesh.edgeCurl
+#Matrices Operator
 MsigIe = mesh.getEdgeInnerProduct(m,invMat=True)
 MsigIf = mesh.getFaceInnerProduct(m,invProp=True)
 MmuIf = mesh.getFaceInnerProduct(mu_0*np.ones(mesh.nC),invProp=True)
@@ -68,21 +77,24 @@ V = Utils.sdiag(mesh.vol)
 A = -CURL*MsigIe*CURL.T*MmuIf
 Id = eye(A.shape[0],A.shape[1])
 
+#Iterate over number of time steps
 for i in timesteps:
     k = timetarget/np.float(i)
     time = [(k,i)]
     print 'time discretization: ',time
     klist.append(k)
-    Ainv = PardisoSolver(Id-k*A)
-    blistback = Backward_Euler_linear(BloopF_t0,A,time,Ainv = Ainv)
+    blistback = Backward_Euler_linear(BloopF_t0,A,time)
     Bbslist.append(blistback[-1][obsindex])
     print 'Numerical solution: ',Bbslist[-1]
 
+#Compute the relative error to analytic
 errorlist = [np.linalg.norm(Bbslist[i]-Bz)/np.linalg.norm(Bz) for i in range(0,len(Bbslist))]
 
+#Estimate the rate of convergence p
 plist = [np.log(errorlist[i+1]/errorlist[i])/np.log(klist[i+1]/klist[i])
         for i in range(0,len(errorlist)-1)]
 
+#Estimate the rate of convergence p
 #plist1 = [np.log(errorlist[i+2]/errorlist[i+1])/np.log(errorlist[i+1]/errorlist[i])
 #        for i in range(0,len(errorlist)-2)]
 

@@ -34,8 +34,10 @@ background = mesh.gridCC[:,2]<-thickness
 m[air] = 1e-8
 m[background] = sigback
 
+#Square loop
 size_square_loop = 55.
 
+#Circular loop of same magnetic moment for analytic
 radius = 2.*size_square_loop/np.sqrt(np.pi)
 
 loopcorner = np.r_[[[mesh.vectorNx[np.argmin(np.abs(mesh.vectorNx+size_square_loop))],mesh.vectorNy[np.argmin(np.abs(mesh.vectorNy+size_square_loop))],0.],
@@ -45,15 +47,19 @@ loopcorner = np.r_[[[mesh.vectorNx[np.argmin(np.abs(mesh.vectorNx+size_square_lo
 
 print 'corner of the square loop: \n',loopcorner
 
+#Compute the source term from the loop
 Js = rectangular_plane_layout(mesh,loopcorner, closed = True,I=1.)
 
+#Matrix operator
 CURL = mesh.edgeCurl
 
+#Receiver
 obsloc = np.r_[[[0.,0.,0.]]]
 listF = np.vstack([mesh.gridFx,mesh.gridFy,mesh.gridFz])
 obsindex =np.argmin(np.linalg.norm(listF-obsloc,axis=1))
 
-#Aloop = BiotSavart_A(mesh.gridCC,mesh,Js)
+
+#Initialize B
 Aloopx = BiotSavart_A(mesh.gridEx,mesh,Js)
 Aloopy = BiotSavart_A(mesh.gridEy,mesh,Js)
 Aloopz = BiotSavart_A(mesh.gridEz,mesh,Js)
@@ -61,6 +67,7 @@ AloopE = np.r_[Aloopx[:,0],Aloopy[:,1],Aloopz[:,2]]
 
 BloopF_t0 = CURL * AloopE
 
+#Matrices Operators
 MsigIe = mesh.getEdgeInnerProduct(m,invMat=True)
 MsigIf = mesh.getFaceInnerProduct(m,invProp=True)
 MmuIf = mesh.getFaceInnerProduct(mu_0*np.ones(mesh.nC),invProp=True)
@@ -71,13 +78,16 @@ V = Utils.sdiag(mesh.vol)
 
 A = -CURL*MsigIe*CURL.T*MmuIf
 
+#Time steps
 time = [(1e-06, 100), (2e-06, 100), (5e-06, 100)]#,(1e-05, 100), (2e-05, 100)]
 
+#Compute field at each time step
 BlistBE = Backward_Euler_linear(BloopF_t0,A,time)
 #BlistBDF2 = BDF2_linear(BloopF_t0,A,time)
 hz0 = hzAnalyticCentLoopT(radius,time_wrapper(time),siglayer1)
 hz1 = hzAnalyticCentLoopT(radius,time_wrapper(time),sigback)
 
+#Extract Receiver information
 BEobslist = np.r_[[BlistBE[i][obsindex] for i in range(len(BlistBE))]]
 BEobslist = BEobslist.flatten()
 #BDFobslist = [BlistBDF2[i][obsindex] for i in range(len(BlistBDF2))]

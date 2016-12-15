@@ -57,6 +57,7 @@ DIV = mesh.faceDiv
 V = Utils.sdiag(mesh.vol)
 A = -CURL*MsigIe*CURL.T*MmuIf
 
+#Time steps
 time = [(1e-06, 100), (2e-06, 100), (5e-06, 100),(1e-05, 100), (2e-05, 100)]
 timeBDF = [(1e-5,400)]
 

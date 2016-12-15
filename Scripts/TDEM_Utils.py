@@ -299,7 +299,7 @@ def BDF4_linear(u0,A,time,Ainv=None):
         newtime.append(time[temp])
     
     #Initialisation: Backward Euler
-    ulist=BDF2_linear(u0,A,time_init)
+    ulist=BDF2_linear(u0,A,time_init,Ainv)
     uaux0 = ulist[0]
     uaux1 = ulist[1]
     uaux2 = ulist[2]
@@ -311,7 +311,7 @@ def BDF4_linear(u0,A,time,Ainv=None):
         	Id = eye(A.shape[0],A.shape[1])
         	#Ainv = splu(Id-k*A)
         	Ainv1 = PardisoSolver(Id-(12./25.)*k*A)
-        	print 'solving for time step: ',k
+        	print 'BDF4: solving for time step: ',k
         else:
         	Ainv1 = Ainv
         for j in range(newtime[i][1]):

@@ -28,10 +28,12 @@ m = sighalf*np.ones(mesh.nC)
 air = mesh.gridCC[:,2]>0.
 m[air] = 1e-8
 
+#Inductive loop
 radius = 50.
 
 CURL = mesh.edgeCurl
 
+#Receiver
 obsloc = np.r_[[[0.,0.,0.]]]
 listF = np.vstack([mesh.gridFx,mesh.gridFy,mesh.gridFz])
 obsindex =np.argmin(np.linalg.norm(listF-obsloc,axis=1))
@@ -63,8 +65,10 @@ V = Utils.sdiag(mesh.vol)
 A = -CURL*MsigIe*CURL.T*MmuIf
 Id = eye(A.shape[0],A.shape[1])
 
+#Time steps
 time = [(1e-06, 100), (2e-06, 100)]
 
+#Compute the field at the time steps
 BfromA_listBE = Backward_Euler_linear(BloopF_fromA,A,time)
 B_from_analytic_listBE = Backward_Euler_linear(BloopF_analytic,A,time)
 

@@ -58,13 +58,15 @@ V = Utils.sdiag(mesh.vol)
 A = -CURL*MsigIe*CURL.T*MmuIf
 
 time = [(1e-06, 100), (2e-06, 100), (5e-06, 100),(1e-05, 100), (2e-05, 100)]
+timeBDF = [(1e-5,400)]
 
 #Compute flux at each time step
 BlistBE = Backward_Euler_linear(BloopF_t0,A,time)
-BlistBDF2 = BDF2_linear(BloopF_t0,A,time)
+BlistBDF2 = BDF2_linear(BloopF_t0,A,timeBDF)
 
 #Analytic for comparison
 hz = hzAnalyticCentLoopT(radius,time_wrapper(time),sigback)
+hz0 = hzAnalyticCentLoopT(radius,time_wrapper(timeBDF),sigback)
 
 #Extract Receiver
 BEobslist = np.r_[[BlistBE[i][obsindex] for i in range(len(BlistBE))]]
@@ -74,14 +76,14 @@ BDFobslist = BDFobslist.flatten()
 
 #Relative errors
 relerr_BE = np.abs(BEobslist[1:]-mu_0*hz)/np.abs(mu_0*hz)
-relerr_BDF = np.abs(BDFobslist[1:]-mu_0*hz)/np.abs(mu_0*hz)
+relerr_BDF = np.abs(BDFobslist[1:]-mu_0*hz0)/np.abs(mu_0*hz0)
 
 
 if PlotIt:
     fig = plt.figure(figsize =(6,6))
     plt.loglog(time_wrapper(time),mu_0*hz,color='k',linewidth=2.,linestyle='dashed')#,marker = '+')
     plt.loglog(time_wrapper(time),BEobslist[1:],color='blue',marker = '+')
-    plt.loglog(time_wrapper(time),BDFobslist[1:],color='red',marker = '*')
+    plt.loglog(time_wrapper(timeBDF),BDFobslist[1:],color='red',marker = '*')
     plt.gca().legend(['Analytic solution, circular loop','Backward Euler','BDF2'],loc=3)
     plt.gca().set_title('TDEM: Synthetic example: Half-Space')
     plt.gca().set_xlabel('Time (s)')
@@ -89,7 +91,7 @@ if PlotIt:
     plt.show()
 
     plt.loglog(time_wrapper(time),relerr_BE,color='blue',marker = '+')
-    plt.loglog(time_wrapper(time),relerr_BDF,color = 'red',marker = '*')
+    plt.loglog(time_wrapper(timeBDF),relerr_BDF,color = 'red',marker = '*')
     plt.gca().set_title('Relative error on Bz response to half-space')
     plt.gca().set_xlabel('Time (s)')
     plt.gca().set_ylabel('Relative error')

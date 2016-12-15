@@ -13,7 +13,7 @@ from scipy.interpolate import interp2d,LinearNDInterpolator
 from scipy.special import ellipk,ellipe
 
 import sys
-path ="../../pymatsolver/" 
+path ="../../../pymatsolver/" 
 #path = "../../../Documents/pymatsolver/"
 sys.path.append(path)
 from pymatsolver import BicgJacobiSolver, PardisoSolver

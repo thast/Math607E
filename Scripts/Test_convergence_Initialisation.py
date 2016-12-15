@@ -67,6 +67,7 @@ if PlotIt == True:
     #plt.gca().set_xticklabels(['%0.2f'%hlist[i] for i in range(0,len(hlist))])
     plt.gca().set_ylabel('relative error to analytic')
     plt.gca().legend(['Relative error to analytic','expected: quadratic convergence'],loc=3)
+    plt.show()
 
     a = mesh.plotSlice(BloopE,vType='F',normal='Y',view='vec',pcolorOpts={'cmap':'Blues'})#clim = [1e-10,1e-9])
     cb = plt.colorbar(a[0])
@@ -77,4 +78,4 @@ if PlotIt == True:
     plt.gca().set_title('B-field at t=0 sec \n for a 10m radius loop')
     plt.show()
 
-    plt.show()
+    

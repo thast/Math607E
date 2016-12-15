@@ -2,7 +2,7 @@ from TDEM_Utils import *
 from TDEM_Analytic import *
 
 """
-Test the linear convergence of Backward Euler
+Test the 4th order convergence of BDF4
 in comparison to the analytic solution for B
 for a cicular loop
 """

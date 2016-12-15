@@ -2,10 +2,12 @@ from TDEM_Utils import *
 from TDEM_Analytic import *
 
 """
-Test the linear convergence of Backward Euler
+Test the quadratic convergence of BDF2
 in comparison to the analytic solution for B
 for a cicular loop
 """
+
+PlotIt = True
 
 #Cell size
 csx, csy, csz = 10.,10.,10.
@@ -40,8 +42,6 @@ BloopF_t0 = CURL * AloopE
 Bt0_analytic = mu_0/(2*radius)
 print 'relative error at initialization: ',np.abs(BloopF_t0[obsindex]-Bt0_analytic)/np.abs(Bt0_analytic)
 
-PlotIt = True
-
 loc = np.r_[[[0.,0.,0.]]]
 obsloc = np.r_[[[0.,0.,0.]]]
 Bbslist = []
@@ -49,7 +49,7 @@ errorlist=[]
 plist = []
 klist = []
 timetarget = 1e-4
-timesteps = range(2,21,2)
+timesteps = range(2,21,4)
 
 Bz =mu_0*hzAnalyticCentLoopT(radius,timetarget,sighalf)
 print 'Analytic solution Bz for time %f s: '%(timetarget),Bz

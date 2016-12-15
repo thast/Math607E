@@ -1,10 +1,6 @@
 from TDEM_Utils import *
 from TDEM_Analytic import *
-import sys
-path ="../../pymatsolver/" 
-#path = "../../../Documents/pymatsolver/"
-sys.path.append(path)
-from pymatsolver import BicgJacobiSolver, PardisoSolver
+
 
 """
 Synthetic Example with a square loop and a layered Earth

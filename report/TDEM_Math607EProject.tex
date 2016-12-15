@@ -179,12 +179,12 @@ where the matricies ${\bf M_{\mu^{-1}}^f}$, ${\bf  M_{\sigma}^e}$ and ${\bf M_e}
 We now have the choice to either express our problem in term of the field \textbf{e} or either in term of the flux \textbf{b}. We choose here to solve for \textbf{b}, as it is easy to initialize thanks to Biot-Savart's law as we will see in the next section. Expressing \textbf{e} in term of \textbf{b} we get:
 
 \begin{align} \label{eq_e}
-{\bf e} & = M_{\sigma}^{e-1} Curl^TM_{\mu^{-1}}^f {\bf b} - CurlM_{\sigma}^{e-1} M_e {\bf j_s}
+{\bf e} & = M_{\sigma}^{e-1} Curl^TM_{\mu^{-1}}^f {\bf b} - M_{\sigma}^{e-1} M_e {\bf j_s}
 \end{align}
 
 And finally we end with a single linear partial differential equation for \textbf{b}:
 \begin{align}
-\frac{ \partial {\bf b}}{\partial t} & = -Curl~ M_{\sigma}^{e-1} Curl^T M_{\mu^{-1}}^f {\bf b} - M_{\sigma}^{e-1} M_e {\bf j_s}
+\frac{ \partial {\bf b}}{\partial t} & = -Curl~ M_{\sigma}^{e-1} Curl^T M_{\mu^{-1}}^f {\bf b} + Curl~ M_{\sigma}^{e-1} M_e {\bf j_s}
 \end{align}
 
 In our code, the tensor mesh and associated matrices are generated thanks to SimPEG (\cite{CKH+:2015}).
